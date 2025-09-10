@@ -19,8 +19,8 @@ deploy:
 		echo "Stopping service..."; \
 		systemctl --user stop $(SERVICE_NAME); \
 	fi; \
-	curl -L -o "bin/$(APP_NAME)" "https://github.com/$(GITHUB_REPO)/releases/download/$$VERSION/$(APP_NAME)-linux_amd64"; \
-	chmod +x "bin/$(APP_NAME)"; \
+	curl -L -o "bin/$(SERVICE_NAME)" "https://github.com/$(GITHUB_REPO)/releases/download/$$VERSION/$(APP_NAME)-linux_amd64"; \
+	chmod +x "bin/$(SERVICE_NAME)"; \
 	if systemctl --user is-enabled $(SERVICE_NAME) >/dev/null 2>&1; then \
 		systemctl --user restart $(SERVICE_NAME); \
 	else \
