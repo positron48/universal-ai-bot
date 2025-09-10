@@ -95,21 +95,15 @@ make help    - Show help
 
 ### CI/CD with GitHub Actions
 
-#### 1. GitHub Repository Variables
+#### 1. GitHub Repository Secrets
 
 Add the following secrets to your GitHub repository (`Settings` → `Secrets and variables` → `Actions`):
 
-**Required Secrets:**
-- `DEPLOY_HOST` - Your server IP address or domain
-- `DEPLOY_USER` - SSH username for deployment
-- `DEPLOY_SSH_KEY` - Private SSH key for deployment
-- `TELEGRAM_TOKEN` - Your Telegram bot token
-- `AI_API_KEY` - Your AI provider API key
-
-**Optional Secrets:**
-- `AI_URL` - AI provider URL (defaults to OpenRouter)
-- `AI_MODEL` - AI model to use (defaults to qwen/qwen3-coder:free)
-- `AI_PROMPT` - System prompt for the AI
+**Required Secrets for CI/CD:**
+- `SERVER_HOST` - Your server IP address or domain (e.g., `192.168.1.100` or `your-domain.com`)
+- `SERVER_USER` - SSH username for deployment (e.g., `deploy` or `ubuntu`)
+- `SERVER_SSH_KEY` - Private SSH key for deployment (contents of your private key file)
+- `SERVER_PATH` - Path to bot directory on server (e.g., `/var/www/english-bot`)
 
 #### 2. Server SSH Key Configuration
 
@@ -119,10 +113,10 @@ For security, create a dedicated SSH key for deployment with restricted commands
 
 ```bash
 # Generate a new SSH key for deployment
-ssh-keygen -t ed25519 -f ~/.ssh/deploy_key -C "deploy@your-domain.com"
+ssh-keygen -t ed25519 -f ~/.ssh/universal-bot -C "deploy@your-domain.com"
 
-# Copy the public key to your server
-ssh-copy-id -i ~/.ssh/deploy_key.pub user@your-server.com
+# Show your public key
+cat ~/.ssh/universal-bot.pub
 ```
 
 **On your server, restrict the SSH key:**
