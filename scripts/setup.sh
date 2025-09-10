@@ -25,7 +25,10 @@ fi
 
 # Load SERVICE_NAME from .env file
 if [ -f "$APP_DIR/.env" ]; then
-    export $(grep -v '^#' "$APP_DIR/.env" | xargs)
+    # Source the .env file to load variables safely
+    set -a  # automatically export all variables
+    source "$APP_DIR/.env"
+    set +a  # stop automatically exporting
 fi
 SERVICE_NAME="${SERVICE_NAME:-ai-bot}"
 
