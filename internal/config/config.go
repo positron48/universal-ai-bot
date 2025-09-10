@@ -136,6 +136,13 @@ func Load() (*Config, error) {
 		config.AI.Prompt = promptFromFile
 	}
 
+	// Process newlines in bot messages
+	config.Bot.StartMessage = processNewlines(config.Bot.StartMessage)
+	config.Bot.HelpMessage = processNewlines(config.Bot.HelpMessage)
+	config.Bot.UnknownCommandMessage = processNewlines(config.Bot.UnknownCommandMessage)
+	config.Bot.ErrorMessage = processNewlines(config.Bot.ErrorMessage)
+	config.Bot.EmptyMessage = processNewlines(config.Bot.EmptyMessage)
+
 	// Validate required fields
 	if config.Telegram.Token == "" {
 		return nil, fmt.Errorf("telegram token is required")
@@ -168,4 +175,9 @@ func GetEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// processNewlines converts \n to actual newlines in bot messages
+func processNewlines(text string) string {
+	return strings.ReplaceAll(text, "\\n", "\n")
 }
