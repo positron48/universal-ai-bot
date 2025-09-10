@@ -76,11 +76,11 @@ func Load() (*Config, error) {
 	viper.SetDefault("ai.model", "gpt-3.5-turbo")
 
 	// Bot message defaults
-	viper.SetDefault("bot.start_message", "🤖 Привет! Я универсальный AI-ассистент.\n\n💡 Просто отправьте мне сообщение, и я помогу вам с любыми вопросами!\n\nИспользуйте /help для получения дополнительной информации.")
-	viper.SetDefault("bot.help_message", "📚 Помощь по использованию AI-ассистента:\n\n💬 **Любое сообщение** → Получите умный ответ:\n• Ответы на вопросы\n• Помощь с задачами\n• Объяснения и советы\n• Творческие идеи\n\n🔧 **Доступные команды:**\n• /start - Начать работу с ботом\n• /help - Показать эту справку\n\n💡 Просто отправьте текст - я сразу помогу!")
-	viper.SetDefault("bot.unknown_command_message", "❓ Неизвестная команда. Используйте /help для получения информации о возможностях бота.")
-	viper.SetDefault("bot.error_message", "Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз.")
-	viper.SetDefault("bot.empty_message", "Пожалуйста, отправьте текстовое сообщение.")
+	viper.SetDefault("bot.start_message", "🤖 Hello! I'm a universal AI assistant.\n\n💡 Just send me a message and I'll help you with any questions!\n\nUse /help for additional information.")
+	viper.SetDefault("bot.help_message", "📚 AI Assistant Help:\n\n💬 **Any message** → Get a smart response:\n• Answer questions\n• Help with tasks\n• Explanations and advice\n• Creative ideas\n\n🔧 **Available commands:**\n• /start - Start working with the bot\n• /help - Show this help\n\n💡 Just send text - I'll help right away!")
+	viper.SetDefault("bot.unknown_command_message", "❓ Unknown command. Use /help to get information about bot capabilities.")
+	viper.SetDefault("bot.error_message", "Sorry, an error occurred while processing your message. Please try again.")
+	viper.SetDefault("bot.empty_message", "Please send a text message.")
 
 	// Bind environment variables
 	viper.AutomaticEnv()
