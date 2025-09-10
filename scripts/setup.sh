@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Universal AI Bot Setup Script (run once with sudo)
 set -e
 
 # Configuration - can be overridden by environment variables
@@ -30,65 +29,13 @@ if [ -f "$APP_DIR/.env" ]; then
 fi
 SERVICE_NAME="${SERVICE_NAME:-ai-bot}"
 
-# Download deployment Makefile
+# Fallback: try to download from GitHub
 curl -s "https://raw.githubusercontent.com/$GITHUB_REPO/master/Makefile.deploy" > "$APP_DIR/Makefile" 2>/dev/null || {
-    # If Makefile.deploy doesn't exist, create a minimal Makefile
-    cat > "$APP_DIR/Makefile" << 'EOF'
-# Deployment Makefile for Universal AI Bot
-GITHUB_REPO ?= positron48/universal-ai-bot
-APP_NAME ?= universal-ai-bot
-
-# Load SERVICE_NAME from .env file
-ifneq (,$(wildcard .env))
-    include .env
-    export
-endif
-SERVICE_NAME ?= ai-bot
-
-# Get latest release
-get_latest_release() {
-    curl -s "https://api.github.com/repos/$(GITHUB_REPO)/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+	echo "❌ Could not find Makefile.deploy locally or download from GitHub"
+	echo "Please ensure Makefile.deploy exists in the repository"
+	exit 1
 }
-
-# Download and install binary
-deploy:
-	@echo "Deploying AI Bot..."
-	@mkdir -p bin
-	@VERSION=$$(get_latest_release); \
-	echo "Version: $$VERSION"; \
-	if systemctl --user is-active $(SERVICE_NAME) >/dev/null 2>&1; then \
-		echo "Stopping service..."; \
-		systemctl --user stop $(SERVICE_NAME); \
-	fi; \
-	curl -L -o "bin/$(APP_NAME)" "https://github.com/$(GITHUB_REPO)/releases/download/$$VERSION/$(APP_NAME)-linux_amd64"; \
-	chmod +x "bin/$(APP_NAME)"; \
-	if systemctl --user is-enabled $(SERVICE_NAME) >/dev/null 2>&1; then \
-		systemctl --user restart $(SERVICE_NAME); \
-	else \
-		echo "Service not configured. Run setup first."; \
-		exit 1; \
-	fi; \
-	echo "Done! Status: systemctl --user status $(SERVICE_NAME)"
-
-update: deploy
-
-status:
-	@systemctl --user status $(SERVICE_NAME)
-
-logs:
-	@journalctl --user -u $(SERVICE_NAME) -f
-
-restart:
-	@systemctl --user restart $(SERVICE_NAME)
-
-stop:
-	@systemctl --user stop $(SERVICE_NAME)
-
-start:
-	@systemctl --user start $(SERVICE_NAME)
-EOF
-    echo "✅ Created deployment Makefile"
-}
+echo "✅ Downloaded Makefile.deploy from GitHub"
 
 # Download deployment script
 curl -s "https://raw.githubusercontent.com/$GITHUB_REPO/master/scripts/deploy.sh" > "$APP_DIR/deploy.sh"
@@ -117,9 +64,6 @@ EOF
 # Enable user service
 systemctl --user daemon-reload
 systemctl --user enable $SERVICE_NAME
-
-# Enable user service autostart
-sudo loginctl enable-linger $USER
 
 echo ""
 echo "🎉 Setup completed!"

@@ -9,7 +9,6 @@ Before deploying the bot, you need to set up the server environment. This is don
 - Ubuntu/Debian server with SSH access
 - User with sudo privileges
 - Go 1.23+ installed (for building from source)
-- Docker and Docker Compose (optional, for containerized deployment)
 
 #### 2. One-Command Setup
 
