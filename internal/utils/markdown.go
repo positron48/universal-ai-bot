@@ -9,25 +9,25 @@ import (
 func ConvertMarkdownToTelegram(text string) string {
 	// Convert headers first
 	text = convertHeaders(text)
-	
+
 	// Convert code blocks (before other formatting)
 	text = convertCodeBlocks(text)
-	
+
 	// Convert lists (before italic to avoid conflicts)
 	text = convertLists(text)
-	
+
 	// Convert bold text
 	text = convertBold(text)
-	
+
 	// Convert italic text
 	text = convertItalic(text)
-	
+
 	// Convert links (basic support)
 	text = convertLinks(text)
-	
+
 	// Clean up extra whitespace
 	text = strings.TrimSpace(text)
-	
+
 	return text
 }
 
@@ -35,31 +35,31 @@ func ConvertMarkdownToTelegram(text string) string {
 func convertHeaders(text string) string {
 	lines := strings.Split(text, "\n")
 	var result []string
-	
+
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		
+
 		// H1: # Header -> **Header**
 		if strings.HasPrefix(trimmed, "# ") {
 			header := strings.TrimPrefix(trimmed, "# ")
 			result = append(result, "**"+header+"**")
 			continue
 		}
-		
+
 		// H2: ## Header -> **Header**
 		if strings.HasPrefix(trimmed, "## ") {
 			header := strings.TrimPrefix(trimmed, "## ")
 			result = append(result, "**"+header+"**")
 			continue
 		}
-		
+
 		// H3: ### Header -> **Header**
 		if strings.HasPrefix(trimmed, "### ") {
 			header := strings.TrimPrefix(trimmed, "### ")
 			result = append(result, "**"+header+"**")
 			continue
 		}
-		
+
 		// H4-H6: #### Header -> **Header**
 		if strings.HasPrefix(trimmed, "#### ") || strings.HasPrefix(trimmed, "##### ") || strings.HasPrefix(trimmed, "###### ") {
 			header := strings.TrimPrefix(trimmed, "#")
@@ -71,10 +71,10 @@ func convertHeaders(text string) string {
 			result = append(result, "**"+header+"**")
 			continue
 		}
-		
+
 		result = append(result, line)
 	}
-	
+
 	return strings.Join(result, "\n")
 }
 
@@ -90,16 +90,16 @@ func convertItalic(text string) string {
 	// Convert *text* to _text_ (Telegram format)
 	// Simple approach: find single asterisks that are not part of double asterisks
 	// We'll use a simple string replacement approach
-	
+
 	// First, protect existing **bold** by replacing with a temporary marker
 	text = strings.ReplaceAll(text, "**", "___BOLD_MARKER___")
-	
+
 	// Now convert single asterisks to underscores
 	text = strings.ReplaceAll(text, "*", "_")
-	
+
 	// Restore bold markers
 	text = strings.ReplaceAll(text, "___BOLD_MARKER___", "**")
-	
+
 	return text
 }
 
@@ -111,43 +111,37 @@ func convertCodeBlocks(text string) string {
 	return text
 }
 
-// convertInlineCode converts Markdown inline code to Telegram format
-func convertInlineCode(text string) string {
-	// Convert `code` to `code` (already Telegram format)
-	return text
-}
-
 // convertLists converts Markdown lists to Telegram format
 func convertLists(text string) string {
 	lines := strings.Split(text, "\n")
 	var result []string
-	
+
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		
+
 		// Convert unordered lists: - item -> • item
 		if strings.HasPrefix(trimmed, "- ") {
 			item := strings.TrimPrefix(trimmed, "- ")
 			result = append(result, "• "+item)
 			continue
 		}
-		
+
 		// Convert unordered lists: * item -> • item
 		if strings.HasPrefix(trimmed, "* ") {
 			item := strings.TrimPrefix(trimmed, "* ")
 			result = append(result, "• "+item)
 			continue
 		}
-		
+
 		// Convert ordered lists: 1. item -> 1. item (keep as is)
 		if regexp.MustCompile(`^\d+\.\s`).MatchString(trimmed) {
 			result = append(result, line)
 			continue
 		}
-		
+
 		result = append(result, line)
 	}
-	
+
 	return strings.Join(result, "\n")
 }
 
@@ -178,6 +172,6 @@ func EscapeTelegramMarkdown(text string) string {
 	text = strings.ReplaceAll(text, "}", "\\}")
 	text = strings.ReplaceAll(text, ".", "\\.")
 	text = strings.ReplaceAll(text, "!", "\\!")
-	
+
 	return text
 }
