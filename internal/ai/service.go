@@ -15,19 +15,19 @@ import (
 
 // Service handles AI provider interactions
 type Service struct {
-	client  *http.Client
-	url     string
-	model   string
-	apiKey  string
-	prompt  string
-	logger  *zap.Logger
+	client *http.Client
+	url    string
+	model  string
+	apiKey string
+	prompt string
+	logger *zap.Logger
 }
 
 // NewService creates a new AI service
 func NewService(url, model, apiKey, prompt string, logger *zap.Logger) *Service {
 	// Process prompt to handle escaped newlines
 	processedPrompt := strings.ReplaceAll(prompt, "\\n", "\n")
-	
+
 	return &Service{
 		client: &http.Client{
 			Timeout: 30 * time.Second,
@@ -42,10 +42,10 @@ func NewService(url, model, apiKey, prompt string, logger *zap.Logger) *Service 
 
 // ChatRequest represents the OpenAI-compatible chat request
 type ChatRequest struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
-	MaxTokens int      `json:"max_tokens,omitempty"`
-	Temperature float64 `json:"temperature,omitempty"`
+	Model       string    `json:"model"`
+	Messages    []Message `json:"messages"`
+	MaxTokens   int       `json:"max_tokens,omitempty"`
+	Temperature float64   `json:"temperature,omitempty"`
 }
 
 // Message represents a chat message

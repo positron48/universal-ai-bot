@@ -6,7 +6,7 @@ DOCKER_TAG := latest
 -include .env
 .EXPORT_ALL_VARIABLES:
 
-.PHONY: all tidy build run test lint setup up clean
+.PHONY: all tidy build run test lint fmt setup up clean
 
 all: build
 
@@ -26,10 +26,14 @@ test:
 test-verbose:
 	$(GO) test -v ./...
 
+# Code formatting
+fmt:
+	$(GO) fmt ./...
+
 # Linting
 GOLANGCI := $(shell if [ -x ./bin/golangci-lint ]; then echo ./bin/golangci-lint; else echo golangci-lint; fi)
 
-lint:
+lint: fmt
 	$(GOLANGCI) run --timeout=3m
 
 lint-install:
@@ -108,6 +112,7 @@ help:
 	@echo "  make run            - Run the application"
 	@echo "  make dev            - Run in development mode"
 	@echo "  make test           - Run tests"
+	@echo "  make fmt            - Format code"
 	@echo "  make lint           - Run linter"
 	@echo "  make clean          - Clean build artifacts"
 	@echo ""

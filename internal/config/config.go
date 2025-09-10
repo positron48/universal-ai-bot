@@ -41,11 +41,11 @@ type LoggingConfig struct {
 
 // AIConfig holds AI provider configuration
 type AIConfig struct {
-	URL         string `mapstructure:"url"`
-	Model       string `mapstructure:"model"`
-	APIKey      string `mapstructure:"api_key"`
-	Prompt      string `mapstructure:"prompt"`
-	PromptFile  string `mapstructure:"prompt_file"`
+	URL        string `mapstructure:"url"`
+	Model      string `mapstructure:"model"`
+	APIKey     string `mapstructure:"api_key"`
+	Prompt     string `mapstructure:"prompt"`
+	PromptFile string `mapstructure:"prompt_file"`
 }
 
 // Load loads configuration from environment variables and config file

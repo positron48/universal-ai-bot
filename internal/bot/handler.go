@@ -11,8 +11,8 @@ import (
 
 // Handler handles Telegram updates
 type Handler struct {
-	bot      *tgbotapi.BotAPI
-	logger   *zap.Logger
+	bot       *tgbotapi.BotAPI
+	logger    *zap.Logger
 	aiService *ai.Service
 }
 
