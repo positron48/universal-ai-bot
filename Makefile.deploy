@@ -9,16 +9,11 @@ ifneq (,$(wildcard .env))
 endif
 SERVICE_NAME ?= ai-bot
 
-# Get latest release
-get_latest_release() {
-	curl -s "https://api.github.com/repos/$(GITHUB_REPO)/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
-}
-
 # Download and install binary
 deploy:
 	@echo "Deploying AI Bot..."
 	@mkdir -p bin
-	@VERSION=$$(get_latest_release); \
+	@VERSION=$$(curl -s "https://api.github.com/repos/$(GITHUB_REPO)/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'); \
 	echo "Version: $$VERSION"; \
 	if systemctl --user is-active $(SERVICE_NAME) >/dev/null 2>&1; then \
 		echo "Stopping service..."; \
