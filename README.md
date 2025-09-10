@@ -26,7 +26,7 @@ A simple AI-powered Telegram bot written in Go that integrates with OpenAI-compa
 ### 1. Cloning and Setup
 
 ```bash
-git clone <your-repo-url>
+git clone git@github.com:positron48/universal-ai-bot.git
 cd ai-bot
 make setup
 ```
