@@ -14,6 +14,42 @@ A simple AI-powered Telegram bot written in Go that integrates with OpenAI-compa
 - Health check endpoint
 - Docker support
 
+## 🚀 Quick Start
+
+Want to get up and running in 2 minutes? Here's the fastest way:
+
+### 1. Download Binary
+```bash
+# Download the latest release for your system
+curl -L -o universal-ai-bot https://github.com/positron48/universal-ai-bot/releases/latest/download/universal-ai-bot-linux_amd64
+chmod +x universal-ai-bot
+```
+
+Binaries for other systems are available on [the Releases page](https://github.com/positron48/universal-ai-bot/releases).
+
+### 2. Create .env File
+```bash
+# Create your configuration file
+cat > .env << 'EOF'
+TELEGRAM_TOKEN=your_bot_token_here
+AI_URL=https://openrouter.ai/api/v1
+AI_API_KEY=your_openrouter_api_key
+AI_MODEL=qwen/qwen3-coder:free
+AI_PROMPT=You are a helpful AI assistant. Please respond to the user's message in a helpful and informative way.
+EOF
+```
+
+### 3. Run!
+```bash
+./universal-ai-bot
+```
+
+**That's it!** 🎉
+
+Your bot is now running and ready to respond to messages in Telegram.
+
+> **Need help?** Get your Telegram bot token from [@BotFather](https://t.me/botfather) and your AI API key from [OpenRouter](https://openrouter.ai/).
+
 ## Requirements
 
 - Go 1.23+
