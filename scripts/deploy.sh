@@ -3,9 +3,9 @@
 # Simple deployment script for Telegram Bot Skeleton
 set -e
 
-GITHUB_REPO="positron48/tgbot-skeleton"  # Replace with your repository
-APP_NAME="tgbot-skeleton"
-APP_DIR="/var/www/tgbot-skeleton"
+GITHUB_REPO="positron48/universal-ai-bot"  # Replace with your repository
+APP_NAME="ai-bot"
+APP_DIR="/var/www/ai-bot"
 
 # Get latest release
 get_latest_release() {
@@ -14,7 +14,7 @@ get_latest_release() {
 
 # Download and install binary
 deploy() {
-    echo "Deploying Telegram Bot Skeleton..."
+    echo "Deploying AI Bot..."
     
     # Create directories
     mkdir -p "$APP_DIR"/{bin,data,logs,configs}
@@ -24,9 +24,9 @@ deploy() {
     echo "Version: $VERSION"
     
     # Stop service before update
-    if systemctl --user is-active tgbot-skeleton >/dev/null 2>&1; then
+    if systemctl --user is-active ai-bot >/dev/null 2>&1; then
         echo "Stopping service..."
-        systemctl --user stop tgbot-skeleton
+        systemctl --user stop ai-bot
     fi
     
     # Download binary
@@ -45,31 +45,31 @@ deploy() {
     curl -s "https://raw.githubusercontent.com/$GITHUB_REPO/master/configs/config.yaml" > "$APP_DIR/configs/config.yaml" 2>/dev/null || echo "Config not found"
     
     # Restart service (if already configured)
-    if systemctl --user is-enabled tgbot-skeleton >/dev/null 2>&1; then
-        systemctl --user restart tgbot-skeleton
+    if systemctl --user is-enabled ai-bot >/dev/null 2>&1; then
+        systemctl --user restart ai-bot
     else
         echo "Service not configured. Run: make setup"
         exit 1
     fi
     
-    echo "Done! Status: systemctl --user status tgbot-skeleton"
+    echo "Done! Status: systemctl --user status ai-bot"
 }
 
 # Update
 update() {
-    echo "Updating Telegram Bot Skeleton..."
-    systemctl --user stop tgbot-skeleton
+    echo "Updating AI Bot..."
+    systemctl --user stop ai-bot
     deploy
 }
 
 # Status
 status() {
-    systemctl --user status tgbot-skeleton
+    systemctl --user status ai-bot
 }
 
 # Logs
 logs() {
-    journalctl --user -u tgbot-skeleton -f
+    journalctl --user -u ai-bot -f
 }
 
 case "${1:-deploy}" in
