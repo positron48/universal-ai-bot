@@ -10,6 +10,7 @@ import (
 	"strings"
 	"syscall"
 
+	"tgbot-skeleton/internal/ai"
 	"tgbot-skeleton/internal/config"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -44,8 +45,17 @@ func New(cfg *config.Config, log *zap.Logger) (*Bot, error) {
 
 	log.Info("authorized on account", zap.String("username", bot.Self.UserName))
 
+	// Create AI service
+	aiService := ai.NewService(
+		cfg.AI.URL,
+		cfg.AI.Model,
+		cfg.AI.APIKey,
+		cfg.AI.Prompt,
+		log,
+	)
+
 	// Create handler
-	handler := NewHandler(bot, log)
+	handler := NewHandler(bot, log, aiService)
 
 	return &Bot{
 		api:     bot,

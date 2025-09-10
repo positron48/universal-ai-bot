@@ -14,6 +14,7 @@ type Config struct {
 	Telegram TelegramConfig `mapstructure:"telegram"`
 	Server   ServerConfig   `mapstructure:"server"`
 	Logging  LoggingConfig  `mapstructure:"logging"`
+	AI       AIConfig       `mapstructure:"ai"`
 }
 
 // TelegramConfig holds Telegram bot configuration
@@ -38,6 +39,15 @@ type LoggingConfig struct {
 	Level string `mapstructure:"level"`
 }
 
+// AIConfig holds AI provider configuration
+type AIConfig struct {
+	URL         string `mapstructure:"url"`
+	Model       string `mapstructure:"model"`
+	APIKey      string `mapstructure:"api_key"`
+	Prompt      string `mapstructure:"prompt"`
+	PromptFile  string `mapstructure:"prompt_file"`
+}
+
 // Load loads configuration from environment variables and config file
 func Load() (*Config, error) {
 	// Load .env file if it exists
@@ -53,6 +63,7 @@ func Load() (*Config, error) {
 	viper.SetDefault("telegram.webhook_path", "/webhook")
 	viper.SetDefault("server.address", ":8080")
 	viper.SetDefault("logging.level", "info")
+	viper.SetDefault("ai.model", "gpt-3.5-turbo")
 
 	// Bind environment variables
 	viper.AutomaticEnv()
@@ -69,6 +80,11 @@ func Load() (*Config, error) {
 	_ = viper.BindEnv("telegram.webhook_path", "TELEGRAM_WEBHOOK_PATH")
 	_ = viper.BindEnv("server.address", "SERVER_ADDRESS")
 	_ = viper.BindEnv("logging.level", "LOG_LEVEL")
+	_ = viper.BindEnv("ai.url", "AI_URL")
+	_ = viper.BindEnv("ai.model", "AI_MODEL")
+	_ = viper.BindEnv("ai.api_key", "AI_API_KEY")
+	_ = viper.BindEnv("ai.prompt", "AI_PROMPT")
+	_ = viper.BindEnv("ai.prompt_file", "AI_PROMPT_FILE")
 
 	// Set config file
 	viper.SetConfigName("config")
@@ -89,12 +105,39 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("error unmarshaling config: %w", err)
 	}
 
+	// Load prompt from file if specified
+	if config.AI.PromptFile != "" {
+		promptFromFile, err := loadPromptFromFile(config.AI.PromptFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load prompt from file: %w", err)
+		}
+		config.AI.Prompt = promptFromFile
+	}
+
 	// Validate required fields
 	if config.Telegram.Token == "" {
 		return nil, fmt.Errorf("telegram token is required")
 	}
+	if config.AI.URL == "" {
+		return nil, fmt.Errorf("ai url is required")
+	}
+	if config.AI.APIKey == "" {
+		return nil, fmt.Errorf("ai api key is required")
+	}
+	if config.AI.Prompt == "" {
+		return nil, fmt.Errorf("ai prompt is required (either AI_PROMPT or AI_PROMPT_FILE must be set)")
+	}
 
 	return &config, nil
+}
+
+// loadPromptFromFile loads prompt content from a file
+func loadPromptFromFile(filePath string) (string, error) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read prompt file %s: %w", filePath, err)
+	}
+	return strings.TrimSpace(string(content)), nil
 }
 
 // GetEnv returns environment variable value or default
