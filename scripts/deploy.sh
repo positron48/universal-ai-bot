@@ -1,11 +1,18 @@
 #!/bin/bash
 
-# Simple deployment script for Telegram Bot Skeleton
+# Universal AI Bot Deployment Script
 set -e
 
-GITHUB_REPO="positron48/universal-ai-bot"  # Replace with your repository
-APP_NAME="ai-bot"
-APP_DIR="/var/www/ai-bot"
+# Configuration - can be overridden by environment variables
+GITHUB_REPO="${GITHUB_REPO:-positron48/universal-ai-bot}"
+APP_NAME="${APP_NAME:-universal-ai-bot}"
+APP_DIR="${PWD}"  # Use current directory
+
+# Load SERVICE_NAME from .env file
+if [ -f "$APP_DIR/.env" ]; then
+    export $(grep -v '^#' "$APP_DIR/.env" | xargs)
+fi
+SERVICE_NAME="${SERVICE_NAME:-ai-bot}"
 
 # Get latest release
 get_latest_release() {
@@ -24,13 +31,13 @@ deploy() {
     echo "Version: $VERSION"
     
     # Stop service before update
-    if systemctl --user is-active ai-bot >/dev/null 2>&1; then
+    if systemctl --user is-active $SERVICE_NAME >/dev/null 2>&1; then
         echo "Stopping service..."
-        systemctl --user stop ai-bot
+        systemctl --user stop $SERVICE_NAME
     fi
     
     # Download binary
-    BINARY_URL="https://github.com/$GITHUB_REPO/releases/download/$VERSION/$APP_NAME-linux-amd64"
+    BINARY_URL="https://github.com/$GITHUB_REPO/releases/download/$VERSION/$APP_NAME-linux_amd64"
     curl -L -o "$APP_DIR/bin/$APP_NAME" "$BINARY_URL"
     chmod +x "$APP_DIR/bin/$APP_NAME"
     
@@ -45,31 +52,31 @@ deploy() {
     curl -s "https://raw.githubusercontent.com/$GITHUB_REPO/master/configs/config.yaml" > "$APP_DIR/configs/config.yaml" 2>/dev/null || echo "Config not found"
     
     # Restart service (if already configured)
-    if systemctl --user is-enabled ai-bot >/dev/null 2>&1; then
-        systemctl --user restart ai-bot
+    if systemctl --user is-enabled $SERVICE_NAME >/dev/null 2>&1; then
+        systemctl --user restart $SERVICE_NAME
     else
-        echo "Service not configured. Run: make setup"
+        echo "Service not configured. Run setup first."
         exit 1
     fi
     
-    echo "Done! Status: systemctl --user status ai-bot"
+    echo "Done! Status: systemctl --user status $SERVICE_NAME"
 }
 
 # Update
 update() {
     echo "Updating AI Bot..."
-    systemctl --user stop ai-bot
+    systemctl --user stop $SERVICE_NAME
     deploy
 }
 
 # Status
 status() {
-    systemctl --user status ai-bot
+    systemctl --user status $SERVICE_NAME
 }
 
 # Logs
 logs() {
-    journalctl --user -u ai-bot -f
+    journalctl --user -u $SERVICE_NAME -f
 }
 
 case "${1:-deploy}" in

@@ -15,6 +15,7 @@ type Config struct {
 	Server   ServerConfig   `mapstructure:"server"`
 	Logging  LoggingConfig  `mapstructure:"logging"`
 	AI       AIConfig       `mapstructure:"ai"`
+	Bot      BotConfig      `mapstructure:"bot"`
 }
 
 // TelegramConfig holds Telegram bot configuration
@@ -48,6 +49,15 @@ type AIConfig struct {
 	PromptFile string `mapstructure:"prompt_file"`
 }
 
+// BotConfig holds bot messages and behavior configuration
+type BotConfig struct {
+	StartMessage          string `mapstructure:"start_message"`
+	HelpMessage           string `mapstructure:"help_message"`
+	UnknownCommandMessage string `mapstructure:"unknown_command_message"`
+	ErrorMessage          string `mapstructure:"error_message"`
+	EmptyMessage          string `mapstructure:"empty_message"`
+}
+
 // Load loads configuration from environment variables and config file
 func Load() (*Config, error) {
 	// Load .env file if it exists
@@ -64,6 +74,13 @@ func Load() (*Config, error) {
 	viper.SetDefault("server.address", ":8080")
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("ai.model", "gpt-3.5-turbo")
+
+	// Bot message defaults
+	viper.SetDefault("bot.start_message", "🤖 Привет! Я универсальный AI-ассистент.\n\n💡 Просто отправьте мне сообщение, и я помогу вам с любыми вопросами!\n\nИспользуйте /help для получения дополнительной информации.")
+	viper.SetDefault("bot.help_message", "📚 Помощь по использованию AI-ассистента:\n\n💬 **Любое сообщение** → Получите умный ответ:\n• Ответы на вопросы\n• Помощь с задачами\n• Объяснения и советы\n• Творческие идеи\n\n🔧 **Доступные команды:**\n• /start - Начать работу с ботом\n• /help - Показать эту справку\n\n💡 Просто отправьте текст - я сразу помогу!")
+	viper.SetDefault("bot.unknown_command_message", "❓ Неизвестная команда. Используйте /help для получения информации о возможностях бота.")
+	viper.SetDefault("bot.error_message", "Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз.")
+	viper.SetDefault("bot.empty_message", "Пожалуйста, отправьте текстовое сообщение.")
 
 	// Bind environment variables
 	viper.AutomaticEnv()
@@ -85,6 +102,11 @@ func Load() (*Config, error) {
 	_ = viper.BindEnv("ai.api_key", "AI_API_KEY")
 	_ = viper.BindEnv("ai.prompt", "AI_PROMPT")
 	_ = viper.BindEnv("ai.prompt_file", "AI_PROMPT_FILE")
+	_ = viper.BindEnv("bot.start_message", "BOT_START_MESSAGE")
+	_ = viper.BindEnv("bot.help_message", "BOT_HELP_MESSAGE")
+	_ = viper.BindEnv("bot.unknown_command_message", "BOT_UNKNOWN_COMMAND_MESSAGE")
+	_ = viper.BindEnv("bot.error_message", "BOT_ERROR_MESSAGE")
+	_ = viper.BindEnv("bot.empty_message", "BOT_EMPTY_MESSAGE")
 
 	// Set config file
 	viper.SetConfigName("config")

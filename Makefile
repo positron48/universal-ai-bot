@@ -1,7 +1,13 @@
-APP_NAME := tgbot-skeleton
+# Project configuration
+APP_NAME := universal-ai-bot
 GO := go
-DOCKER_IMAGE := tgbot-skeleton
+DOCKER_IMAGE := universal-ai-bot
 DOCKER_TAG := latest
+
+# Deployment configuration
+GITHUB_REPO ?= positron48/universal-ai-bot
+DEPLOY_APP_DIR ?= /var/www/ai-bot
+SERVICE_NAME ?= ai-bot
 
 -include .env
 .EXPORT_ALL_VARIABLES:
@@ -41,8 +47,8 @@ lint-install:
 	@mkdir -p bin
 	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ./bin v1.61.0
 
-# Setup
-setup:
+# Local setup
+setup-local:
 	@echo "Setting up project..."
 	@mkdir -p bin
 	@cp env.example .env
@@ -91,23 +97,27 @@ docker-dev-restart:
 
 # Deployment commands
 deploy:
-	@chmod +x scripts/deploy.sh && ./scripts/deploy.sh deploy
+	@chmod +x scripts/deploy.sh && GITHUB_REPO=$(GITHUB_REPO) APP_NAME=$(APP_NAME) APP_DIR=$(DEPLOY_APP_DIR) SERVICE_NAME=$(SERVICE_NAME) ./scripts/deploy.sh deploy
 
 docker-deploy: docker-build docker-run
 
 update:
-	@chmod +x scripts/deploy.sh && ./scripts/deploy.sh update
+	@chmod +x scripts/deploy.sh && GITHUB_REPO=$(GITHUB_REPO) APP_NAME=$(APP_NAME) APP_DIR=$(DEPLOY_APP_DIR) SERVICE_NAME=$(SERVICE_NAME) ./scripts/deploy.sh update
 
 status:
-	@chmod +x scripts/deploy.sh && ./scripts/deploy.sh status
+	@chmod +x scripts/deploy.sh && SERVICE_NAME=$(SERVICE_NAME) ./scripts/deploy.sh status
 
 logs:
-	@chmod +x scripts/deploy.sh && ./scripts/deploy.sh logs
+	@chmod +x scripts/deploy.sh && SERVICE_NAME=$(SERVICE_NAME) ./scripts/deploy.sh logs
+
+setup:
+	@chmod +x scripts/setup.sh && APP_DIR=$(DEPLOY_APP_DIR) SERVICE_NAME=$(SERVICE_NAME) ./scripts/setup.sh
 
 # Help
 help:
 	@echo "Available commands:"
-	@echo "  make setup          - Initial project setup"
+	@echo "  make setup-local    - Initial local project setup"
+	@echo "  make setup          - Setup systemd service (requires sudo)"
 	@echo "  make build          - Build the application"
 	@echo "  make run            - Run the application"
 	@echo "  make dev            - Run in development mode"

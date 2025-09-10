@@ -1,0 +1,63 @@
+# Deployment Makefile for Universal AI Bot
+GITHUB_REPO ?= positron48/universal-ai-bot
+APP_NAME ?= universal-ai-bot
+
+# Load SERVICE_NAME from .env file
+ifneq (,$(wildcard .env))
+    include .env
+    export
+endif
+SERVICE_NAME ?= ai-bot
+
+# Get latest release
+get_latest_release() {
+	curl -s "https://api.github.com/repos/$(GITHUB_REPO)/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+}
+
+# Download and install binary
+deploy:
+	@echo "Deploying AI Bot..."
+	@mkdir -p bin
+	@VERSION=$$(get_latest_release); \
+	echo "Version: $$VERSION"; \
+	if systemctl --user is-active $(SERVICE_NAME) >/dev/null 2>&1; then \
+		echo "Stopping service..."; \
+		systemctl --user stop $(SERVICE_NAME); \
+	fi; \
+	curl -L -o "bin/$(APP_NAME)" "https://github.com/$(GITHUB_REPO)/releases/download/$$VERSION/$(APP_NAME)-linux_amd64"; \
+	chmod +x "bin/$(APP_NAME)"; \
+	if systemctl --user is-enabled $(SERVICE_NAME) >/dev/null 2>&1; then \
+		systemctl --user restart $(SERVICE_NAME); \
+	else \
+		echo "Service not configured. Run setup first."; \
+		exit 1; \
+	fi; \
+	echo "Done! Status: systemctl --user status $(SERVICE_NAME)"
+
+update: deploy
+
+status:
+	@systemctl --user status $(SERVICE_NAME)
+
+logs:
+	@journalctl --user -u $(SERVICE_NAME) -f
+
+restart:
+	@systemctl --user restart $(SERVICE_NAME)
+
+stop:
+	@systemctl --user stop $(SERVICE_NAME)
+
+start:
+	@systemctl --user start $(SERVICE_NAME)
+
+help:
+	@echo "Available commands:"
+	@echo "  make deploy  - Deploy/update the bot"
+	@echo "  make update  - Update to latest version"
+	@echo "  make status  - Check service status"
+	@echo "  make logs    - View service logs"
+	@echo "  make restart - Restart service"
+	@echo "  make stop    - Stop service"
+	@echo "  make start   - Start service"
+	@echo "  make help    - Show this help"

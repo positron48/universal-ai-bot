@@ -55,7 +55,7 @@ func New(cfg *config.Config, log *zap.Logger) (*Bot, error) {
 	)
 
 	// Create handler
-	handler := NewHandler(bot, log, aiService)
+	handler := NewHandler(bot, log, aiService, cfg)
 
 	return &Bot{
 		api:     bot,

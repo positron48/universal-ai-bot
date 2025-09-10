@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"tgbot-skeleton/internal/ai"
+	"tgbot-skeleton/internal/config"
 	"tgbot-skeleton/internal/utils"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -15,14 +16,16 @@ type Handler struct {
 	bot       *tgbotapi.BotAPI
 	logger    *zap.Logger
 	aiService *ai.Service
+	config    *config.Config
 }
 
 // NewHandler creates a new handler
-func NewHandler(bot *tgbotapi.BotAPI, logger *zap.Logger, aiService *ai.Service) *Handler {
+func NewHandler(bot *tgbotapi.BotAPI, logger *zap.Logger, aiService *ai.Service, config *config.Config) *Handler {
 	return &Handler{
 		bot:       bot,
 		logger:    logger,
 		aiService: aiService,
+		config:    config,
 	}
 }
 
@@ -58,11 +61,11 @@ func (h *Handler) handleCommand(ctx context.Context, message *tgbotapi.Message) 
 
 	switch command {
 	case "start":
-		h.sendMessage(chatID, "🇬🇧 Привет! Я ваш персональный преподаватель английского языка!\n\n📝 Что я умею:\n• Исправлять ошибки в английском тексте\n• Переводить с русского на английский\n• Создавать карточки слов с объяснениями\n\n💡 Как пользоваться:\n• Отправьте английский текст → получите исправления\n• Отправьте русский текст → получите перевод\n• Отправьте одно слово → получите карточку слова\n\nИспользуйте /help для подробной информации.")
+		h.sendMessage(chatID, h.config.Bot.StartMessage)
 	case "help":
-		h.sendMessage(chatID, "📚 Помощь по использованию бота-преподавателя английского:\n\n🔤 **Одно слово** → Карточка слова с:\n• Частью речи\n• Транскрипцией IPA\n• Определением на русском\n• Примерами использования\n• Формами неправильных глаголов\n\n📝 **Английский текст** → Исправления:\n• Поиск ошибок (орфография, грамматика, пунктуация)\n• Подробные объяснения\n• Исправленная версия\n\n🇷🇺 **Русский текст** → Перевод:\n• Естественный перевод на английский\n• Анализ сложных фраз\n• Сохранение тона и стиля\n\n💬 Просто отправьте текст или слово - я сразу помогу!")
+		h.sendMessage(chatID, h.config.Bot.HelpMessage)
 	default:
-		h.sendMessage(chatID, "❓ Неизвестная команда. Используйте /help для получения информации о возможностях бота.")
+		h.sendMessage(chatID, h.config.Bot.UnknownCommandMessage)
 	}
 }
 
@@ -72,7 +75,7 @@ func (h *Handler) handleMessage(ctx context.Context, message *tgbotapi.Message) 
 	text := message.Text
 
 	if text == "" {
-		h.sendMessage(chatID, "Пожалуйста, отправьте текстовое сообщение.")
+		h.sendMessage(chatID, h.config.Bot.EmptyMessage)
 		return
 	}
 
@@ -88,7 +91,7 @@ func (h *Handler) handleMessage(ctx context.Context, message *tgbotapi.Message) 
 	response, err := h.aiService.GenerateResponse(ctx, text)
 	if err != nil {
 		h.logger.Error("failed to get AI response", zap.Error(err))
-		h.sendMessage(chatID, "Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз.")
+		h.sendMessage(chatID, h.config.Bot.ErrorMessage)
 		return
 	}
 

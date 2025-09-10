@@ -410,6 +410,10 @@ curl http://localhost:8080/health
 
 This project is distributed under the most permissive license - the MIT License. This allows maximum freedom for use, modification, and distribution. See the `LICENSE` file for details.
 
+## Deployment
+
+See [deployment.md](DEPLOYMENT.md)
+
 ## Support
 
 If you have questions or issues:
