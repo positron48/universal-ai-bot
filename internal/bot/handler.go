@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"tgbot-skeleton/internal/ai"
+	"tgbot-skeleton/internal/utils"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go.uber.org/zap"
@@ -93,8 +94,9 @@ func (h *Handler) handleMessage(ctx context.Context, message *tgbotapi.Message) 
 		return
 	}
 
-	// Send AI response
-	h.sendMessage(chatID, response)
+	// Convert Markdown to Telegram format and send AI response
+	telegramResponse := utils.ConvertMarkdownToTelegram(response)
+	h.sendMessage(chatID, telegramResponse)
 }
 
 // sendMessage sends a message to the specified chat

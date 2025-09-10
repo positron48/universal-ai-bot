@@ -6,6 +6,7 @@ A simple AI-powered Telegram bot written in Go that integrates with OpenAI-compa
 
 - AI-powered responses using OpenAI-compatible APIs
 - Support for OpenRouter and other providers
+- **Automatic Markdown to Telegram formatting** - converts AI responses to proper Telegram format
 - Long polling and webhook support
 - Structured logging with Zap
 - Configuration management with Viper
@@ -87,7 +88,8 @@ make docker-stop
 2. Bot sends a typing indicator
 3. Bot forwards the message to the AI provider with the configured system prompt
 4. AI provider processes the request and returns a response
-5. Bot sends the AI response back to the user
+5. Bot converts Markdown formatting to Telegram format
+6. Bot sends the formatted AI response back to the user
 
 ## Supported AI Providers
 
@@ -224,6 +226,48 @@ Guidelines:
 Remember: [key principles]
 ```
 
+## Markdown Formatting Support
+
+The bot automatically converts AI responses from Markdown to Telegram format. Supported formatting includes:
+
+### ✅ **Supported Elements:**
+- **Headers** (`#`, `##`, `###`) → **Bold text**
+- **Bold text** (`**text**`, `__text__`) → **Bold text**
+- **Italic text** (`*text*`) → _Italic text_
+- **Code blocks** (```language → ```)
+- **Inline code** (`` `code` ``)
+- **Unordered lists** (`-`, `*`) → • Bullet points
+- **Ordered lists** (`1.`, `2.`) → Numbered lists
+- **Links** (`[text](url)`) → [text](url)
+
+### 📝 **Example Conversion:**
+
+**Input (AI Response):**
+```markdown
+# Welcome to AI Bot
+
+This is **bold** and *italic* text.
+
+## Features
+- Feature 1
+- Feature 2
+
+Use `code` for examples.
+```
+
+**Output (Telegram):**
+```
+**Welcome to AI Bot**
+
+This is **bold** and _italic_ text.
+
+**Features**
+• Feature 1
+• Feature 2
+
+Use `code` for examples.
+```
+
 ## Project Structure
 
 ```
@@ -233,7 +277,8 @@ english-bot/
 │   ├── ai/                  # AI service for provider integration
 │   ├── bot/                 # Bot logic and handlers
 │   ├── config/              # Configuration management
-│   └── logger/              # Logging configuration
+│   ├── logger/              # Logging configuration
+│   └── utils/               # Utility functions (Markdown conversion)
 ├── prompts/                 # AI prompt files
 │   ├── simple-assistant.txt
 │   ├── customer-support.txt
